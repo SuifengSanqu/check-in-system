@@ -1,12 +1,12 @@
 import os
-import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+HAVE_STATIC = os.path.isdir(STATIC_DIR) and os.path.isfile(os.path.join(STATIC_DIR, "index.html"))
 
 
 @asynccontextmanager
@@ -45,22 +45,21 @@ app.include_router(web_records.router, prefix="/api/web/records", tags=["Web Rec
 app.include_router(miniapp.router, prefix="/api/miniapp", tags=["MiniApp"])
 
 
-@app.get("/")
-def root():
-    return {"service": "check-in-system", "status": "running"}
-
-
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
 
 
-if os.path.isdir(STATIC_DIR) and os.path.isfile(os.path.join(STATIC_DIR, "index.html")):
+if HAVE_STATIC:
     app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
 
-    @app.get("/app/{full_path:path}")
+    @app.get("/{full_path:path}", response_class=HTMLResponse)
     async def serve_spa(full_path: str):
         file_path = os.path.join(STATIC_DIR, full_path)
         if full_path and os.path.isfile(file_path):
             return FileResponse(file_path)
         return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+else:
+    @app.get("/")
+    def root():
+        return {"service": "check-in-system", "status": "running", "note": "Frontend not built"}
