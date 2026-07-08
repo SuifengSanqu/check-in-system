@@ -29,7 +29,7 @@ RUN pip install --break-system-packages --no-cache-dir \
     fastapi uvicorn[standard] sqlalchemy python-jose[cryptography] \
     pycryptodome apscheduler requests
 
-RUN npm install -g puppeteer puppeteer-extra puppeteer-extra-plugin-stealth puppeteer-extra-plugin-user-preferences
+RUN npm install -g puppeteer puppeteer-extra puppeteer-extra-plugin-stealth puppeteer-extra-plugin-user-preferences puppeteer-extra-plugin-user-data-dir
 
 COPY web/package.json web/package-lock.json /tmp/web/
 WORKDIR /tmp/web
