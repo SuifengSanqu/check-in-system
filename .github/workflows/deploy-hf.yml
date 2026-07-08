@@ -23,27 +23,77 @@ jobs:
         run: |
           pip install huggingface_hub
 
-          python3 << 'EOF'
-          import os
-          from huggingface_hub import HfApi, create_repo
+          python3 << 'PYEOF'
+          import os, subprocess, json, urllib.request, urllib.error
 
           token = os.environ["HF_TOKEN"]
-          api = HfApi(token=token)
-          user = api.whoami()["name"]
+          headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+          # Get user info
+          req = urllib.request.Request("https://huggingface.co/api/whoami-v2", headers=headers)
+          try:
+              resp = urllib.request.urlopen(req, timeout=30)
+              user_data = json.loads(resp.read().decode())
+              user = user_data["name"]
+              print(f"User: {user}")
+          except Exception as e:
+              print(f"whoami-v2 failed: {e}")
+              user = "SuifengSanqu"
+
           space_id = f"{user}/check-in-system"
 
+          # Delete existing Space
           try:
-              create_repo("check-in-system", repo_type="space", space_sdk="docker", token=token, exist_ok=True)
-              print(f"Space {space_id} ready")
+              req = urllib.request.Request(
+                  f"https://huggingface.co/api/repos/{user}/check-in-system",
+                  headers=headers,
+                  method="DELETE"
+              )
+              resp = urllib.request.urlopen(req, timeout=30)
+              print(f"Deleted Space: {resp.status}")
           except Exception as e:
-              print(f"Create repo: {e}")
+              print(f"Delete: {e}")
 
+          # Create Space
+          create_data = json.dumps({
+              "name": "check-in-system",
+              "type": "space",
+              "sdk": "docker",
+              "private": False
+          }).encode()
+          req = urllib.request.Request(
+              "https://huggingface.co/api/repos/create",
+              data=create_data,
+              headers=headers,
+              method="POST"
+          )
+          try:
+              resp = urllib.request.urlopen(req, timeout=30)
+              print(f"Create Space: {resp.status} - {resp.read().decode()[:300]}")
+          except urllib.error.HTTPError as e:
+              body = e.read().decode()[:500] if e.fp else ""
+              print(f"Create Space error: {e.code} - {body}")
+          except Exception as e:
+              print(f"Create Space exception: {e}")
+
+          # Push
           remote_url = f"https://{user}:{token}@huggingface.co/spaces/{space_id}"
-
-          import subprocess
           subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
           subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
-          subprocess.run(["git", "remote", "add", "hf", remote_url], check=True)
-          subprocess.run(["git", "push", "hf", "master:main", "--force"], check=True)
-          print("Deployed successfully!")
-          EOF
+
+          result = subprocess.run(["git", "ls-remote", remote_url], capture_output=True, text=True)
+          print(f"Remote refs:\n  {result.stdout.strip()}")
+          
+          subprocess.run(["git", "remote", "add", "hf", remote_url], check=False)
+          result = subprocess.run(["git", "push", "hf", "HEAD:main", "--force", "-v"], capture_output=True, text=True)
+          print(f"Push: rc={result.returncode}")
+          if result.stdout:
+              print(f"  stdout: {result.stdout[-500:]}")
+          if result.stderr:
+              print(f"  stderr: {result.stderr[-500:]}")
+
+          result = subprocess.run(["git", "ls-remote", remote_url], capture_output=True, text=True)
+          print(f"After push refs:\n  {result.stdout.strip()}")
+          
+          print("Deployed!")
+          PYEOF
