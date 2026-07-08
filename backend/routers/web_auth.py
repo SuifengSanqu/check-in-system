@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel, field_validator
 from passlib.context import CryptContext
 
@@ -52,9 +53,16 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         password_hash=pwd_context.hash(req.password),
         nickname=req.nickname or req.username,
     )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Username already exists")
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Registration failed, please try again")
 
     token = create_web_token(user.id)
     return TokenResponse(token=token, user={"id": user.id, "username": user.username, "nickname": user.nickname})
