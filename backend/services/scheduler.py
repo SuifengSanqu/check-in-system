@@ -16,6 +16,8 @@ scheduler = BackgroundScheduler()
 
 SCRIPTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "scripts")
 SCREENSHOTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "screenshots")
+if os.path.isdir("/data"):
+    SCREENSHOTS_DIR = "/data/screenshots"
 
 
 def schedule_all():

@@ -13,7 +13,8 @@ HAVE_STATIC = os.path.isdir(STATIC_DIR) and os.path.isfile(os.path.join(STATIC_D
 async def lifespan(app: FastAPI):
     from database import engine, Base
     Base.metadata.create_all(bind=engine)
-    os.makedirs("screenshots", exist_ok=True)
+    data_dir = "/data" if os.path.isdir("/data") else "."
+    os.makedirs(os.path.join(data_dir, "screenshots"), exist_ok=True)
     try:
         from services.scheduler import scheduler, schedule_all
         scheduler.start()
