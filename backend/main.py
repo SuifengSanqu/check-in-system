@@ -12,6 +12,8 @@ HAVE_STATIC = os.path.isdir(STATIC_DIR) and os.path.isfile(os.path.join(STATIC_D
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from migrate import run_migrations
+    run_migrations()
     from database import engine, Base
     Base.metadata.create_all(bind=engine)
     data_dir = "/data" if os.path.isdir("/data") else "."

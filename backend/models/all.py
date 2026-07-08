@@ -27,11 +27,31 @@ class TargetAccount(Base):
     login_url = Column(String(512), nullable=False)
     login_username = Column(String(256), nullable=False)
     login_password = Column(Text, nullable=False)
+
+    # --- Custom selectors for login form ---
+    login_username_selector = Column(String(256), default="")
+    login_password_selector = Column(String(256), default="")
+    login_button_selector = Column(String(256), default="")
+    # "single": username+password on same page; "two_step": username first, then password
+    login_flow = Column(String(16), default="single")
+
+    # --- Post-login & check-in ---
+    checkin_nav_url = Column(String(512), default="")
     checkin_selector = Column(String(256), default="")
     checkin_text = Column(String(256), default="")
+    # JSON array: [{"action":"click","selector":".foo"},{"action":"wait","ms":2000}]
+    checkin_extra_steps = Column(Text, default="")
+
+    # --- Popup / banner dismissal ---
+    cookie_banner_selector = Column(String(256), default="")
+    # JSON array of selectors
+    popup_selectors = Column(Text, default="")
+
+    # --- Scheduling ---
     time_window_start = Column(String(5), default="06:00")
     time_window_end = Column(String(5), default="22:00")
     enabled = Column(Boolean, default=True)
+
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("WebUser", back_populates="accounts")

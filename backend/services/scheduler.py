@@ -72,16 +72,7 @@ def execute_checkin(account_id: int):
             if r.execute_time and r.execute_time.date() == today and r.status == "success":
                 return
 
-        task_config = _build_random_config()
-
-        params = {
-            "login_url": account.login_url,
-            "username": account.login_username,
-            "password": decrypt(account.login_password),
-            "checkin_selector": account.checkin_selector,
-            "checkin_text": account.checkin_text,
-            "random_config": task_config,
-        }
+        params = _build_checkin_params(account)
 
         script_path = os.path.join(SCRIPTS_DIR, "checkin.js")
         env = os.environ.copy()
@@ -147,15 +138,7 @@ def run_manual_checkin(account_id: int) -> dict:
         if not account:
             return {"status": "error", "message": "Account not found"}
 
-        task_config = _build_random_config()
-        params = {
-            "login_url": account.login_url,
-            "username": account.login_username,
-            "password": decrypt(account.login_password),
-            "checkin_selector": account.checkin_selector,
-            "checkin_text": account.checkin_text,
-            "random_config": task_config,
-        }
+        params = _build_checkin_params(account)
 
         script_path = os.path.join(SCRIPTS_DIR, "checkin.js")
 
@@ -230,6 +213,32 @@ def _build_random_config() -> dict:
         "scroll_steps_max": 8,
         "mouse_steps_min": 20,
         "mouse_steps_max": 40,
+    }
+
+
+def _build_checkin_params(account: TargetAccount) -> dict:
+    popup_selectors = []
+    if account.popup_selectors:
+        try:
+            popup_selectors = json.loads(account.popup_selectors)
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    return {
+        "login_url": account.login_url,
+        "username": account.login_username,
+        "password": decrypt(account.login_password),
+        "login_username_selector": account.login_username_selector,
+        "login_password_selector": account.login_password_selector,
+        "login_button_selector": account.login_button_selector,
+        "login_flow": account.login_flow,
+        "checkin_nav_url": account.checkin_nav_url,
+        "checkin_selector": account.checkin_selector,
+        "checkin_text": account.checkin_text,
+        "checkin_extra_steps": account.checkin_extra_steps,
+        "cookie_banner_selector": account.cookie_banner_selector,
+        "popup_selectors": popup_selectors,
+        "random_config": _build_random_config(),
     }
 
 

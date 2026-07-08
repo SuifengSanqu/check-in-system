@@ -1,5 +1,6 @@
 import hashlib
 import os
+import bcrypt
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
@@ -14,15 +15,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/web/auth/login")
 
 _HASH_ITERATIONS = 260000
 _SALT_LENGTH = 16
+_BCRYPT_PREFIX = "$2b$"
 
 
 def hash_password(password: str) -> str:
-    salt = os.urandom(_SALT_LENGTH)
-    dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, _HASH_ITERATIONS)
-    return f"{salt.hex()}${dk.hex()}"
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(password: str, stored: str) -> bool:
+    if stored.startswith(_BCRYPT_PREFIX):
+        return bcrypt.checkpw(password.encode(), stored.encode())
+
     try:
         salt_hex, hash_hex = stored.split("$")
         salt = bytes.fromhex(salt_hex)
@@ -31,6 +34,14 @@ def verify_password(password: str, stored: str) -> bool:
         return dk == expected
     except Exception:
         return False
+
+
+def migrate_password_if_needed(password: str, stored: str) -> str | None:
+    if stored.startswith(_BCRYPT_PREFIX):
+        return None
+    if verify_password(password, stored):
+        return hash_password(password)
+    return None
 
 
 def create_web_token(user_id: int) -> str:

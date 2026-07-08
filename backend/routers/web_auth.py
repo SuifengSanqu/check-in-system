@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_validator
 
 from database import get_db
 from models.all import WebUser
-from utils.auth import hash_password, verify_password, create_web_token
+from utils.auth import hash_password, verify_password, create_web_token, migrate_password_if_needed
 
 router = APIRouter()
 
@@ -71,6 +71,11 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(WebUser).filter(WebUser.username == req.username).first()
     if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    new_hash = migrate_password_if_needed(req.password, user.password_hash)
+    if new_hash:
+        user.password_hash = new_hash
+        db.commit()
 
     token = create_web_token(user.id)
     return TokenResponse(token=token, user={"id": user.id, "username": user.username, "nickname": user.nickname})
