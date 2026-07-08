@@ -1,6 +1,10 @@
 import os
 
-DATA_DIR = "/data" if os.path.isdir("/data") else "."
+if os.path.isdir("/data") and os.access("/data", os.W_OK):
+    DATA_DIR = "/data"
+else:
+    DATA_DIR = "."
+
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DATA_DIR}/checkin.db")
 JWT_SECRET_WEB = os.getenv("JWT_SECRET_WEB", "web-secret-key-change-in-production")
 JWT_SECRET_MINIAPP = os.getenv("JWT_SECRET_MINIAPP", "miniapp-secret-key-change-in-production")
