@@ -1,29 +1,18 @@
-FROM node:20-slim
+FROM ghcr.io/puppeteer/puppeteer:latest
+
+USER root
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-venv \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    xdg-utils \
-    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
-
-RUN npm install -g puppeteer puppeteer-extra puppeteer-extra-plugin-stealth \
-    && npx puppeteer browsers install chrome
 
 RUN pip install --break-system-packages --no-cache-dir \
     fastapi uvicorn[standard] sqlalchemy python-jose[cryptography] \
     passlib[bcrypt] bcrypt pycryptodome apscheduler requests
+
+RUN npm install -g puppeteer-extra puppeteer-extra-plugin-stealth
 
 COPY web/package.json web/package-lock.json /tmp/web/
 WORKDIR /tmp/web
@@ -43,4 +32,4 @@ ENV NODE_PATH=/usr/local/lib/node_modules
 
 EXPOSE 7860
 
-CMD ["sh", "-c", "export PUPPETEER_EXECUTABLE_PATH=$(find /root/.cache/puppeteer -name chrome -type f 2>/dev/null | head -1) && echo \"Chrome: $PUPPETEER_EXECUTABLE_PATH\" && python3 -m uvicorn main:app --host 0.0.0.0 --port 7860"]
+CMD ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
