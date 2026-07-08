@@ -2,14 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel, field_validator
-from passlib.context import CryptContext
 
 from database import get_db
 from models.all import WebUser
-from utils.auth import create_web_token
+from utils.auth import hash_password, verify_password, create_web_token
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class RegisterRequest(BaseModel):
@@ -50,7 +48,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
 
     user = WebUser(
         username=req.username,
-        password_hash=pwd_context.hash(req.password),
+        password_hash=hash_password(req.password),
         nickname=req.nickname or req.username,
     )
     try:
@@ -71,7 +69,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/login", response_model=TokenResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(WebUser).filter(WebUser.username == req.username).first()
-    if not user or not pwd_context.verify(req.password, user.password_hash):
+    if not user or not verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     token = create_web_token(user.id)

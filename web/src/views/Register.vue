@@ -46,7 +46,7 @@ export default {
         localStorage.setItem('user', JSON.stringify(data.user))
         this.$router.push('/dashboard')
       } catch (e) {
-        this.error = '注册失败，请重试'
+        this.error = e.message || '注册失败，请重试'
       } finally {
         this.loading = false
       }

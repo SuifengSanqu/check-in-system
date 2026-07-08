@@ -13,7 +13,11 @@ async function request(url, options = {}) {
     window.location.href = '/login'
     return
   }
-  return resp.json()
+  const data = await resp.json()
+  if (!resp.ok) {
+    throw new Error(data.detail || `Request failed with status ${resp.status}`)
+  }
+  return data
 }
 
 export const api = {

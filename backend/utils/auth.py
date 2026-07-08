@@ -1,3 +1,5 @@
+import hashlib
+import os
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
@@ -9,6 +11,26 @@ from database import get_db
 from models.all import WebUser, MiniAppUser
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/web/auth/login")
+
+_HASH_ITERATIONS = 260000
+_SALT_LENGTH = 16
+
+
+def hash_password(password: str) -> str:
+    salt = os.urandom(_SALT_LENGTH)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, _HASH_ITERATIONS)
+    return f"{salt.hex()}${dk.hex()}"
+
+
+def verify_password(password: str, stored: str) -> bool:
+    try:
+        salt_hex, hash_hex = stored.split("$")
+        salt = bytes.fromhex(salt_hex)
+        expected = bytes.fromhex(hash_hex)
+        dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, _HASH_ITERATIONS)
+        return dk == expected
+    except Exception:
+        return False
 
 
 def create_web_token(user_id: int) -> str:

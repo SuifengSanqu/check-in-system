@@ -86,10 +86,12 @@ async function run() {
     const cfg = params.random_config;
 
     const browser = await puppeteer.launch({
-        headless: 'new',
+        headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
             '--disable-blink-features=AutomationControlled',
         ],
     });
@@ -196,9 +198,9 @@ async function run() {
         await browser.close();
 
         const result = {
-            status: checkinClicked ? 'success' : 'success',
+            status: checkinClicked ? 'success' : 'no_checkin_found',
             screenshot_path: screenshotPath,
-            error: '',
+            error: checkinClicked ? '' : 'No matching check-in button found on page',
         };
         process.stdout.write(JSON.stringify(result));
     } catch (err) {

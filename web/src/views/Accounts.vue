@@ -133,8 +133,14 @@ export default {
       await this.loadAccounts()
     },
     async runCheckin(id) {
-      await api.runAccount(id)
-      alert('签到已执行，请查看记录')
+      const result = await api.runAccount(id)
+      if (result.status === 'success') {
+        alert('签到成功')
+      } else if (result.status === 'error') {
+        alert('签到执行出错：' + (result.message || result.error || '未知错误'))
+      } else {
+        alert('签到结果：' + JSON.stringify(result))
+      }
     }
   }
 }

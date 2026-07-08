@@ -76,7 +76,7 @@ def execute_checkin(account_id: int):
 
         params = {
             "login_url": account.login_url,
-            "username": decrypt(account.login_username),
+            "username": account.login_username,
             "password": decrypt(account.login_password),
             "checkin_selector": account.checkin_selector,
             "checkin_text": account.checkin_text,
@@ -150,7 +150,7 @@ def run_manual_checkin(account_id: int) -> dict:
         task_config = _build_random_config()
         params = {
             "login_url": account.login_url,
-            "username": decrypt(account.login_username),
+            "username": account.login_username,
             "password": decrypt(account.login_password),
             "checkin_selector": account.checkin_selector,
             "checkin_text": account.checkin_text,

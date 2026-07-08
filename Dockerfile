@@ -1,28 +1,45 @@
-FROM ghcr.io/puppeteer/puppeteer:latest
-
-USER root
+FROM node:18-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-venv \
+    chromium \
+    chromium-sandbox \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libatspi2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libgbm1 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxkbcommon0 \
+    libxrandr2 \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 RUN pip install --break-system-packages --no-cache-dir \
     fastapi uvicorn[standard] sqlalchemy python-jose[cryptography] \
-    passlib[bcrypt] bcrypt pycryptodome apscheduler requests huggingface_hub
+    pycryptodome apscheduler requests
 
-RUN npm install -g puppeteer-extra puppeteer-extra-plugin-stealth
+RUN npm install -g puppeteer puppeteer-extra puppeteer-extra-plugin-stealth puppeteer-extra-plugin-user-preferences
 
 COPY web/package.json web/package-lock.json /tmp/web/
 WORKDIR /tmp/web
 RUN npm install
-
 COPY web/ /tmp/web/
 RUN npm run build
 
+ARG CACHEBUST=5
 COPY backend/ /tmp/backend/
-RUN mkdir -p /tmp/backend/static \
+RUN echo "build: ${CACHEBUST}" && mkdir -p /tmp/backend/static \
     && cp -r /tmp/web/dist/* /tmp/backend/static/
 
 WORKDIR /app
