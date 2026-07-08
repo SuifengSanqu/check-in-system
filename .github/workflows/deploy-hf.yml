@@ -1,0 +1,49 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Deploy to HF Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install huggingface_hub
+
+          python3 << 'EOF'
+          import os
+          from huggingface_hub import HfApi, create_repo
+
+          token = os.environ["HF_TOKEN"]
+          api = HfApi(token=token)
+          user = api.whoami()["name"]
+          space_id = f"{user}/check-in-system"
+
+          try:
+              create_repo("check-in-system", repo_type="space", space_sdk="docker", token=token, exist_ok=True)
+              print(f"Space {space_id} ready")
+          except Exception as e:
+              print(f"Create repo: {e}")
+
+          remote_url = f"https://{user}:{token}@huggingface.co/spaces/{space_id}"
+
+          import subprocess
+          subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
+          subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
+          subprocess.run(["git", "remote", "add", "hf", remote_url], check=True)
+          subprocess.run(["git", "push", "hf", "master", "--force"], check=True)
+          print("Deployed successfully!")
+          EOF
