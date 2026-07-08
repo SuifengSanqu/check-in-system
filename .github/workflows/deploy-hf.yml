@@ -44,6 +44,6 @@ jobs:
           subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
           subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
           subprocess.run(["git", "remote", "add", "hf", remote_url], check=True)
-          subprocess.run(["git", "push", "hf", "master", "--force"], check=True)
+          subprocess.run(["git", "push", "hf", "master:main", "--force"], check=True)
           print("Deployed successfully!")
           EOF
