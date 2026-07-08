@@ -174,3 +174,10 @@
 *.lz
 *.lzma
 *.iso
+
+# Database
+*.db
+
+# Screenshots
+screenshots/
+

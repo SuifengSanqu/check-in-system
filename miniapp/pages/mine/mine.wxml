@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="avatar-area">
+    <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+    <view wx:else class="avatar-placeholder">?</view>
+  </view>
+  <view class="nickname">{{ nickname || '微信用户' }}</view>
+
+  <view class="stats-box">
+    <view class="stat-row">
+      <view class="stat-label">累计签到</view>
+      <view class="stat-num">{{ totalDays }} 天</view>
+    </view>
+    <view class="stat-row">
+      <view class="stat-label">连续签到</view>
+      <view class="stat-num">{{ consecutiveDays }} 天</view>
+    </view>
+  </view>
+</view>

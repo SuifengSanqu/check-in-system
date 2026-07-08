@@ -1,0 +1,16 @@
+.container { padding: 24px; }
+.header { text-align: center; margin: 32px 0 40px; }
+.title { font-size: 26px; font-weight: 700; color: #1a1a2e; }
+.date { font-size: 14px; color: #999; margin-top: 8px; }
+.checkin-area { display: flex; justify-content: center; margin-bottom: 40px; }
+.checkin-btn { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, #4a6cf7, #6c8cff); display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 20px rgba(74,108,247,0.3); }
+.btn-icon { font-size: 40px; color: #fff; line-height: 1; }
+.btn-text { font-size: 18px; color: #fff; margin-top: 4px; }
+.checked-box { width: 140px; height: 140px; border-radius: 50%; background: #e8f5e9; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid #27ae60; }
+.checked-icon { font-size: 36px; color: #27ae60; }
+.checked-text { font-size: 15px; color: #27ae60; margin-top: 4px; font-weight: 600; }
+.checked-time { font-size: 12px; color: #999; margin-top: 4px; }
+.stats-row { display: flex; justify-content: center; gap: 40px; }
+.stat-item { text-align: center; }
+.stat-value { font-size: 36px; font-weight: 700; color: #1a1a2e; }
+.stat-label { font-size: 13px; color: #999; margin-top: 4px; }

@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="month-header">
+    <view class="arrow" bindtap="prevMonth">&lt;</view>
+    <view class="month-title">{{ year }}年{{ month }}月</view>
+    <view class="arrow" bindtap="nextMonth">&gt;</view>
+  </view>
+
+  <view class="weekday-row">
+    <view wx:for="{{weekdays}}" wx:key="*this" class="weekday">{{ item }}</view>
+  </view>
+
+  <view class="calendar-grid">
+    <view wx:for="{{cells}}" wx:key="index" class="cell {{item.checked ? 'checked' : ''}} {{item.isToday ? 'today' : ''}} {{item.empty ? 'empty' : ''}}">
+      {{ item.day }}
+    </view>
+  </view>
+
+  <view class="legend">
+    <view class="legend-item"><view class="dot checked-dot"></view> 已签到</view>
+    <view class="legend-item"><view class="dot today-dot"></view> 今天</view>
+  </view>
+</view>

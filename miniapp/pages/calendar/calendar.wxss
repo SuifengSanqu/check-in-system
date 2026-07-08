@@ -1,0 +1,16 @@
+.container { padding: 16px; }
+.month-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0 20px; }
+.month-title { font-size: 18px; font-weight: 600; }
+.arrow { font-size: 20px; padding: 8px 12px; color: #4a6cf7; }
+.weekday-row { display: flex; margin-bottom: 8px; }
+.weekday { flex: 1; text-align: center; font-size: 13px; color: #999; padding: 8px 0; }
+.calendar-grid { display: flex; flex-wrap: wrap; }
+.cell { width: calc(100% / 7); text-align: center; padding: 12px 0; font-size: 15px; border-radius: 50%; }
+.cell.checked { background: #d4edda; color: #27ae60; font-weight: 600; }
+.cell.today { background: #4a6cf7; color: #fff; font-weight: 600; }
+.cell.empty { color: transparent; }
+.legend { display: flex; justify-content: center; gap: 24px; margin-top: 20px; font-size: 13px; color: #888; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.checked-dot { background: #d4edda; border: 1px solid #27ae60; }
+.today-dot { background: #4a6cf7; }

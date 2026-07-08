@@ -1,0 +1,10 @@
+{
+  "libVersion": "3.0.0",
+  "projectname": "每日签到",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": true
+  }
+}

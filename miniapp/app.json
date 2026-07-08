@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/calendar/calendar",
+    "pages/records/records",
+    "pages/mine/mine"
+  ],
+  "window": {
+    "navigationBarTitleText": "每日签到",
+    "navigationBarBackgroundColor": "#4a6cf7",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f0f2f5"
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#4a6cf7",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "签到", "iconPath": "images/home.png", "selectedIconPath": "images/home-active.png" },
+      { "pagePath": "pages/calendar/calendar", "text": "日历", "iconPath": "images/calendar.png", "selectedIconPath": "images/calendar-active.png" },
+      { "pagePath": "pages/records/records", "text": "记录", "iconPath": "images/list.png", "selectedIconPath": "images/list-active.png" },
+      { "pagePath": "pages/mine/mine", "text": "我的", "iconPath": "images/user.png", "selectedIconPath": "images/user-active.png" }
+    ]
+  },
+  "style": "v2"
+}

@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="header">
+    <view class="title">每日签到</view>
+    <view class="date">{{ todayStr }}</view>
+  </view>
+
+  <view class="checkin-area">
+    <view wx:if="{{!checkedIn}}" class="checkin-btn" bindtap="doCheckin">
+      <view class="btn-icon">+</view>
+      <view class="btn-text">签到</view>
+    </view>
+    <view wx:else class="checked-box">
+      <view class="checked-icon">&#10003;</view>
+      <view class="checked-text">今日已签到</view>
+      <view class="checked-time">{{ checkinTime }}</view>
+    </view>
+  </view>
+
+  <view class="stats-row">
+    <view class="stat-item">
+      <view class="stat-value">{{ consecutiveDays }}</view>
+      <view class="stat-label">连续签到</view>
+    </view>
+    <view class="stat-item">
+      <view class="stat-value">{{ totalDays }}</view>
+      <view class="stat-label">累计签到</view>
+    </view>
+  </view>
+</view>
