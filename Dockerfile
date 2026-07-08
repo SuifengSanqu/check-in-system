@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip install --break-system-packages --no-cache-dir \
     fastapi uvicorn[standard] sqlalchemy python-jose[cryptography] \
-    passlib[bcrypt] bcrypt pycryptodome apscheduler requests
+    passlib[bcrypt] bcrypt pycryptodome apscheduler requests huggingface_hub
 
 RUN npm install -g puppeteer-extra puppeteer-extra-plugin-stealth
 
