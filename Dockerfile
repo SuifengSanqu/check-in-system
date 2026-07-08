@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     chromium \
     chromium-sandbox \
+    dbus \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcups2 \
     libdrm2 \
     libgbm1 \
+    libgtk-3-0 \
     libnss3 \
     libxcomposite1 \
     libxdamage1 \
