@@ -4,8 +4,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg \
     chromium \
-    chromium-sandbox \
+    chromium-common \
     fonts-noto-cjk \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libgbm1 \
+    libnss3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -17,21 +28,23 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 
 RUN npm install -g puppeteer puppeteer-extra puppeteer-extra-plugin-stealth
 
-WORKDIR /app
+COPY backend/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-COPY backend/requirements.txt /app/requirements.txt
-RUN pip install --break-system-packages --no-cache-dir -r requirements.txt
-
-COPY web/package.json web/package-lock.json /app/web/
-WORKDIR /app/web
+COPY web/package.json web/package-lock.json /tmp/web/
+WORKDIR /tmp/web
 RUN npm install
 
-COPY web/ /app/web/
+COPY web/ /tmp/web/
 RUN npm run build
 
 WORKDIR /app
 COPY backend/ /app/
-RUN mkdir -p /app/static && cp -r /app/web/dist/* /app/static/
+RUN mkdir -p /app/static \
+    && cp -r /tmp/web/dist/* /app/static/ \
+    && ls -la /app/static/ \
+    && echo "--- static contents ---" \
+    && ls -la /app/static/assets/ 2>/dev/null || echo "no assets dir"
 
 ENV NODE_PATH=/usr/local/lib/node_modules
 

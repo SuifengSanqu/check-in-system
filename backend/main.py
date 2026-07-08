@@ -1,4 +1,5 @@
 import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,7 +8,6 @@ from fastapi.responses import FileResponse
 
 from database import engine, Base
 from routers import web_auth, web_accounts, web_records, miniapp
-from services.scheduler import scheduler, schedule_all
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
@@ -16,13 +16,18 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     os.makedirs("screenshots", exist_ok=True)
-    scheduler.start()
     try:
+        from services.scheduler import scheduler, schedule_all
+        scheduler.start()
         schedule_all()
+    except Exception as e:
+        print(f"[startup] scheduler skipped: {e}", flush=True)
+    yield
+    try:
+        from services.scheduler import scheduler
+        scheduler.shutdown()
     except Exception:
         pass
-    yield
-    scheduler.shutdown()
 
 
 app = FastAPI(title="统一签到系统", lifespan=lifespan)
@@ -46,13 +51,19 @@ def health():
     return {"status": "ok"}
 
 
-if os.path.isdir(STATIC_DIR):
+@app.get("/")
+def root():
+    return {"service": "check-in-system", "status": "running"}
+
+
+if os.path.isdir(STATIC_DIR) and os.path.isfile(os.path.join(STATIC_DIR, "index.html")):
     app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
 
-    @app.get("/{full_path:path}")
+    @app.get("/app/{full_path:path}")
     async def serve_spa(full_path: str):
         file_path = os.path.join(STATIC_DIR, full_path)
-        if os.path.isfile(file_path):
+        if full_path and os.path.isfile(file_path):
             return FileResponse(file_path)
         return FileResponse(os.path.join(STATIC_DIR, "index.html"))
-
+else:
+    print(f"[startup] static dir not ready: STATIC_DIR={STATIC_DIR}, exists={os.path.isdir(STATIC_DIR)}", flush=True)
