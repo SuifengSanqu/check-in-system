@@ -86,14 +86,18 @@ async function run() {
     const cfg = params.random_config;
 
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: 'new',
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
+            '--disable-gpu',
             '--disable-blink-features=AutomationControlled',
+            '--disable-features=TranslateUI',
+            '--single-process',
         ],
+        ignoreDefaultArgs: ['--disable-extensions'],
     });
 
     const page = await browser.newPage();
