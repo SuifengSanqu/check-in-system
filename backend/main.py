@@ -11,13 +11,6 @@ HAVE_STATIC = os.path.isdir(STATIC_DIR) and os.path.isfile(os.path.join(STATIC_D
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        from utils.persist import restore_database, start_persist_loop
-        restore_database()
-        start_persist_loop()
-    except Exception as e:
-        print(f"[startup] persist skipped: {e}", flush=True)
-
     from database import engine, Base
     Base.metadata.create_all(bind=engine)
     data_dir = "/data" if os.path.isdir("/data") else "."
@@ -32,11 +25,6 @@ async def lifespan(app: FastAPI):
     try:
         from services.scheduler import scheduler
         scheduler.shutdown()
-    except Exception:
-        pass
-    try:
-        from utils.persist import save_database
-        save_database()
     except Exception:
         pass
 
