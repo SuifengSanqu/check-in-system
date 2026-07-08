@@ -29,7 +29,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 RUN pip install --break-system-packages --no-cache-dir \
     fastapi uvicorn[standard] sqlalchemy python-jose[cryptography] \
-    pycryptodome apscheduler requests
+    pycryptodome apscheduler requests bcrypt
 
 RUN npm install -g puppeteer puppeteer-extra puppeteer-extra-plugin-stealth puppeteer-extra-plugin-user-preferences puppeteer-extra-plugin-user-data-dir
 
